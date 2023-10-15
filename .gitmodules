@@ -1,0 +1,6 @@
+[submodule "content"]
+	path = content
+	url = git@github.com:wakame-tech/markdown.git
+[submodule "themes/apollo"]
+	path = themes/apollo
+	url = https://github.com/not-matthias/apollo
