@@ -6,9 +6,7 @@ build_search_index = true
 
 theme = "apollo"
 
-taxonomies = [
-    {name = "tags"}
-]
+taxonomies = [{ name = "tags" }]
 
 ignored_content = [
   # "*/_paste/*",
@@ -36,8 +34,8 @@ mathjax_dollar_inline_enable = true
 theme = "auto"
 socials = []
 menu = [
-    { name = "blog", url = "/blog", weight = 1 },
-    { name = "lifelog", url = "/reports", weight = 2 },
-    # { name = "tags", url = "/tags", weight = 3 },
-    { name = "about", url = "/about", weight = 4 },
+  { name = "blog", url = "/blog", weight = 1 },
+  { name = "lifelog", url = "/reports", weight = 2 },
+  # { name = "tags", url = "/tags", weight = 3 },
+  { name = "about", url = "/about", weight = 4 },
 ]
