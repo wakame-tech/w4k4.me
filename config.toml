@@ -1,4 +1,4 @@
-base_url = "https://w4k4.me"
+base_url = "https://blog.w4k4.me"
 
 compile_sass = true
 
@@ -35,7 +35,7 @@ theme = "auto"
 socials = []
 menu = [
   { name = "blog", url = "/blog", weight = 1 },
-  { name = "lifelog", url = "/reports", weight = 2 },
+  { name = "lifelog", url = "/lifelog", weight = 2 },
   # { name = "tags", url = "/tags", weight = 3 },
   { name = "about", url = "/about", weight = 4 },
 ]
