@@ -32,6 +32,7 @@ internal_level = "warn"
 mathjax = true
 mathjax_dollar_inline_enable = true
 theme = "auto"
+comment = false
 socials = []
 menu = [
   { name = "blog", url = "/blog", weight = 1 },
