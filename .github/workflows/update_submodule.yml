@@ -1,0 +1,27 @@
+name: Update submodule
+on:
+  repository_dispatch:
+    types: [update]
+
+jobs:
+  update_submodule:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+      - name: Update submodule
+        run: git submodule update --remote
+      - name: Commit
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "action@github.com"
+          git add .
+          git status
+          git commit -m "Update content"
+      - name: Push
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
