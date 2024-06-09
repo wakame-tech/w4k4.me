@@ -1,0 +1,15 @@
+@import "../themes/apollo/sass/main.scss";
+
+img {
+    border: 0px;
+    max-width: 70%;
+}
+
+:root.light {
+    --primary-color: #00897B;
+}
+
+:root.dark {
+    --primary-color: #00897B;
+    --bg-0: #313131;
+}
