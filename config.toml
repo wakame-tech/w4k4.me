@@ -1,11 +1,8 @@
 base_url = "https://blog.w4k4.me"
-
+title = "過ぎるだけの時間じゃ悔しい"
+build_search_index = false
 compile_sass = true
-
-build_search_index = true
-
 theme = "apollo"
-
 taxonomies = [{ name = "tags" }]
 
 ignored_content = [
@@ -35,7 +32,7 @@ theme = "auto"
 comment = false
 socials = []
 menu = [
-  { name = "blog", url = "/blog", weight = 1 },
+  { name = "blog", url = "", weight = 1 },
   { name = "lifelog", url = "/reports", weight = 2 },
   # { name = "tags", url = "/tags", weight = 3 },
   { name = "about", url = "/about", weight = 4 },
