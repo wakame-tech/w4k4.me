@@ -4,6 +4,8 @@ build_search_index = false
 compile_sass = true
 theme = "apollo"
 taxonomies = [{ name = "tags" }]
+generate_feeds = true
+feed_filenames = ["rss.xml"]
 
 ignored_content = [
   # "*/_paste/*",
@@ -16,6 +18,7 @@ ignored_content = [
   "*/novel/*",
   "*/post/*",
   "*/work/*",
+  "*/CLAUDE.md",
   "*/README.md",
 ]
 
@@ -36,4 +39,5 @@ menu = [
   { name = "lifelog", url = "/reports", weight = 2 },
   # { name = "tags", url = "/tags", weight = 3 },
   { name = "about", url = "/about", weight = 4 },
+  { name = "rss", url = "/rss.xml", weight = 4 },
 ]
