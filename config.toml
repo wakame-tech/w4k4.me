@@ -18,6 +18,7 @@ ignored_content = [
   "*/post/*",
   "*/work/*",
   "*/CLAUDE.md",
+  "*/vtla_slide/*",
   "*/README.md",
 ]
 
