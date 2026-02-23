@@ -22,3 +22,22 @@ blockquote cite {
     display: block;
     text-align: right;
 }
+
+// 脚注参照の上付き文字リンクには下線不要
+.footnote-reference a,
+.footnote-definition-label {
+    border-bottom: none;
+}
+
+// 脚注リスト全体のレイアウト
+.footnote-definition {
+    display: flex;
+    gap: 0.4em;
+    font-size: 0.85em;
+    color: var(--text-1, grey);
+    margin-top: 0.3em;
+
+    p {
+        margin: 0;
+    }
+}
