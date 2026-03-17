@@ -8,6 +8,7 @@ generate_feeds = true
 
 ignored_content = [
   # "*/_paste/*",
+  "*/node_modules/*",
   "*/.obsidian/*",
   "*/_templates/*",
   "*/Excalidraw/*",
