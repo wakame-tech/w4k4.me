@@ -268,4 +268,10 @@
         <script defer
                 src="{{ get_url(path='js/searchElasticlunr.min.js', cachebust=true) | safe }}"></script>
     {%- endif -%}
+
+    {# Mermaid #}
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
 </head>
