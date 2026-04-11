@@ -1,21 +1,38 @@
 @import "../themes/apollo/sass/main.scss";
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&display=swap');
 
-img {
-    border: 0px;
-    max-width: 70%;
+.shippori-mincho-regular {
+    font-family: "Shippori Mincho", serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
-:root.light {
+.shippori-mincho-bold {
+    font-family: "Shippori Mincho", serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+:root.dark, :root.light {
+    // --primary-color: #00897B;
+    --text-font: "Shippori Mincho", serif;
+    --header-font: "Shippori Mincho", serif;
+    --bg-0: #f7fff8;
+    --bg-1: #f1f8f8;
+    --text-0: #000000;
     --primary-color: #00897B;
 }
 
-:root.dark {
-    --primary-color: #00897B;
-    --bg-0: #313131;
+.page-header {
+    font-weight: bold;
 }
 
 .list-item {
     margin-bottom: .25rem;
+}
+
+code, pre {
+    border: none;
 }
 
 blockquote cite {
@@ -40,4 +57,9 @@ blockquote cite {
     p {
         margin: 0;
     }
+}
+
+.content img {
+    display: block;
+    max-width: 50vh;
 }
