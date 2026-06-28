@@ -11,6 +11,7 @@ configuration:
   ignorePatterns:
     - "**/private/**"
     - "**/lifelog/**"
+    - "**/techblog/**"
     - "**/*.base"
     - private
     - lifelog
@@ -48,7 +49,7 @@ plugins:
   - source: github:quartz-community/created-modified-date
     enabled: true
     options:
-      defaultDateType: modified
+      defaultDateType: created
       priority:
         - frontmatter
         - filesystem
