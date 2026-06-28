@@ -12,6 +12,7 @@ configuration:
     - "**/private/**"
     - "**/lifelog/**"
     - "**/techblog/**"
+    - "**/kibela/**"
     - "**/*.base"
     - private
     - lifelog
