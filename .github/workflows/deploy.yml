@@ -17,6 +17,12 @@ jobs:
         with:
           node-version: 22
       - run: npm ci
+      # Local plugins can't be locked portably (quartz.lock.json stores an
+      # absolute path), so link ./plugins/* into the plugin cache by hand.
+      - name: Link local plugins
+        run: |
+          mkdir -p .quartz/plugins
+          ln -sfn ../../plugins/footer .quartz/plugins/footer
       - run: npx quartz plugin install
       - run: npx quartz build -d content/wiki
       - uses: amondnet/vercel-action@v20

@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
 configuration:
-  pageTitle: Quartz 5
+  pageTitle: 過ぎるだけの時間じゃ悔しい
   pageTitleSuffix: ""
   enableSPA: true
   enablePopovers: true
@@ -226,12 +226,15 @@ plugins:
     layout:
       position: afterBody
       priority: 10
-  - source: github:quartz-community/footer
+  - source: ./plugins/footer
     enabled: true
     options:
-      links:
-        GitHub: https://github.com/jackyzha0/quartz
-        Discord Community: https://discord.gg/cRFFHYye7t
+      links: {}
+      notice:
+        before: "このサイトは "
+        linkText: Karpathy LLM Wiki
+        href: https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f
+        after: " パターンによる自動生成です。"
   - source: github:quartz-community/recent-notes
     enabled: false
   - source: github:quartz-community/spacer
