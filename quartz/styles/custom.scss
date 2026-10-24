@@ -59,3 +59,14 @@ html[saved-theme] .note-properties-tags a.internal-link.tag-link {
     max-width: none;
   }
 }
+
+// The explorer's server HTML has no `collapsed` class; its script adds one
+// after load on phones. Until then the full-screen menu sits open over the
+// page, then animates shut. Keep it hidden unless the toggle has opened it
+// (the only thing that sets aria-expanded="true").
+@media all and #{$mobile} {
+  html .explorer:not([aria-expanded="true"]) > .explorer-content {
+    visibility: hidden;
+    transform: translateX(-100vw);
+  }
+}
