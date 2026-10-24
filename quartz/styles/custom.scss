@@ -70,3 +70,16 @@ html[saved-theme] .note-properties-tags a.internal-link.tag-link {
     transform: translateX(-100vw);
   }
 }
+
+// Tags and backlinks: plain teal-500 text instead of the theme's yellow
+// highlight. The theme's tag rule ties on specificity and loads after this
+// file, hence !important.
+$teal-500: #14b8a6;
+html[saved-theme] body a.internal-link.tag-link,
+html[saved-theme] body .backlinks a.internal {
+  &,
+  &:hover {
+    background-color: transparent !important;
+    color: $teal-500 !important;
+  }
+}
