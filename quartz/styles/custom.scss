@@ -1,3 +1,16 @@
 @use "./variables.scss" as *;
 
 // put your custom CSS here!
+
+// Mermaid reads these theme colors with getPropertyValue() and parses them
+// itself. quartz-themes defines some as `hsl(calc(...))`, which an unregistered
+// custom property returns verbatim and mermaid rejects ("Unsupported color
+// format"), so no diagram renders. Registering them as <color> makes the
+// browser return the computed rgb() value instead.
+@each $name in "secondary", "tertiary", "gray", "light", "lightgray", "highlight", "dark", "darkgray" {
+  @property --#{$name} {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: transparent;
+  }
+}
