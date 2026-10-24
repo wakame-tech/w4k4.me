@@ -25,6 +25,7 @@ jobs:
           ln -sfn ../../plugins/footer .quartz/plugins/footer
           ln -sfn ../../plugins/rss .quartz/plugins/rss
           ln -sfn ../../plugins/bluesky-embed .quartz/plugins/bluesky-embed
+          ln -sfn ../../plugins/tag-link-text .quartz/plugins/tag-link-text
       - run: npx quartz plugin install
       - run: npx quartz build -d content/wiki
       - uses: amondnet/vercel-action@v20

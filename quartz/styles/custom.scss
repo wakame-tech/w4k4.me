@@ -14,3 +14,23 @@
     initial-value: transparent;
   }
 }
+
+// quartz-themes renders every tag link as a `display: flex` pill. Inside a
+// body list item that stretches the pill across the whole line; keep it as
+// wide as its text. `html[saved-theme]` outranks the theme's own selector.
+html[saved-theme] body article a.internal-link.tag-link {
+  display: inline-flex;
+}
+
+// In the narrow Properties cell on phones the pills broke inside words, one
+// letter per line. Keep each pill whole and wrap between pills instead.
+.note-properties-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem;
+}
+html[saved-theme] .note-properties-tags a.internal-link.tag-link {
+  white-space: nowrap;
+}
+
