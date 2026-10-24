@@ -239,6 +239,19 @@ plugins:
       limit: 20
   - source: ./plugins/bluesky-embed
     enabled: true
+  - source: ./plugins/post-nav
+    enabled: true
+    options:
+      folders:
+        - blog
+        - monthly
+        - yearly
+      labels:
+        prev: « 前の記事
+        next: 次の記事 »
+    layout:
+      position: afterBody
+      priority: 5
   - source: ./plugins/footer
     enabled: true
     options:

@@ -1,0 +1,50 @@
+{
+  "name": "@w4k4/post-nav",
+  "version": "1.0.0",
+  "description": "Previous / next post links within the same folder, ordered by frontmatter date",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "peerDependencies": {
+    "preact": "^10.0.0"
+  },
+  "quartz": {
+    "name": "post-nav",
+    "displayName": "Post Navigation",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "folders": ["blog"]
+    },
+    "components": {
+      "PostNav": {
+        "displayName": "Post Navigation",
+        "defaultPosition": "afterBody",
+        "defaultPriority": 5
+      }
+    },
+    "optionSchema": {
+      "folders": {
+        "type": "array"
+      },
+      "labels": {
+        "type": "object"
+      }
+    }
+  }
+}
