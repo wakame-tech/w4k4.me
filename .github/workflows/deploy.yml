@@ -24,6 +24,7 @@ jobs:
           mkdir -p .quartz/plugins
           ln -sfn ../../plugins/footer .quartz/plugins/footer
           ln -sfn ../../plugins/rss .quartz/plugins/rss
+          ln -sfn ../../plugins/bluesky-embed .quartz/plugins/bluesky-embed
       - run: npx quartz plugin install
       - run: npx quartz build -d content/wiki
       - uses: amondnet/vercel-action@v20

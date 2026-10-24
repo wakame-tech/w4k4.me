@@ -234,6 +234,8 @@ plugins:
         - monthly
         - yearly
       limit: 20
+  - source: ./plugins/bluesky-embed
+    enabled: true
   - source: ./plugins/footer
     enabled: true
     options:
