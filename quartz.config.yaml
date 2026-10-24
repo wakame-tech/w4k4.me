@@ -252,6 +252,17 @@ plugins:
     layout:
       position: afterBody
       priority: 5
+  - source: ./plugins/post-author
+    enabled: true
+    options:
+      folders:
+        - blog
+        - monthly
+        - yearly
+      label: "著者: "
+    layout:
+      position: beforeBody
+      priority: 25
   - source: ./plugins/footer
     enabled: true
     options:

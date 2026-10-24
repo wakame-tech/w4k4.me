@@ -1,0 +1,51 @@
+{
+  "name": "@w4k4/post-author",
+  "version": "1.0.0",
+  "description": "Shows the frontmatter author under a post's meta line when it is set",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "peerDependencies": {
+    "preact": "^10.0.0"
+  },
+  "quartz": {
+    "name": "post-author",
+    "displayName": "Post Author",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "folders": ["blog"],
+      "label": "Author: "
+    },
+    "components": {
+      "PostAuthor": {
+        "displayName": "Post Author",
+        "defaultPosition": "beforeBody",
+        "defaultPriority": 25
+      }
+    },
+    "optionSchema": {
+      "folders": {
+        "type": "array"
+      },
+      "label": {
+        "type": "string"
+      }
+    }
+  }
+}
