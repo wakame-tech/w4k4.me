@@ -1,0 +1,38 @@
+{
+  "name": "@w4k4/bluesky-embed",
+  "version": "1.0.0",
+  "description": "Makes Bluesky post embeds follow the site theme without opaque corners",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "quartz": {
+    "name": "bluesky-embed",
+    "displayName": "Bluesky Embed",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {},
+    "components": {
+      "BlueskyEmbed": {
+        "displayName": "Bluesky Embed",
+        "defaultPosition": "afterBody",
+        "defaultPriority": 100
+      }
+    },
+    "optionSchema": {}
+  }
+}

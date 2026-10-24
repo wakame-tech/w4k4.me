@@ -1,0 +1,44 @@
+{
+  "name": "@w4k4/iso-dates",
+  "version": "1.0.0",
+  "description": "Shows every <time> on the page as YYYY-MM-DD",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "quartz": {
+    "name": "iso-dates",
+    "displayName": "ISO Dates",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "timeZone": "Asia/Tokyo"
+    },
+    "components": {
+      "IsoDates": {
+        "displayName": "ISO Dates",
+        "defaultPosition": "afterBody",
+        "defaultPriority": 100
+      }
+    },
+    "optionSchema": {
+      "timeZone": {
+        "type": "string"
+      }
+    }
+  }
+}

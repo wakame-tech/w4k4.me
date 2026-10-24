@@ -1,0 +1,27 @@
+{
+  "name": "@w4k4/tag-link-text",
+  "version": "1.0.0",
+  "description": "Keeps the full path of nested inline tags (#watch/comic) as their link text",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "quartz": {
+    "name": "tag-link-text",
+    "displayName": "Tag Link Text",
+    "category": "transformer",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 65,
+    "defaultEnabled": true,
+    "defaultOptions": {}
+  }
+}

@@ -93,6 +93,9 @@ plugins:
     options:
       markdownLinkResolution: shortest
     order: 60
+  - source: ./plugins/tag-link-text
+    enabled: true
+    order: 65
   - source: github:quartz-community/description
     enabled: true
     order: 70
@@ -163,7 +166,7 @@ plugins:
       position: left
       priority: 50
   - source: github:quartz-community/graph
-    enabled: true
+    enabled: false
     layout:
       position: right
       priority: 10
@@ -234,6 +237,37 @@ plugins:
         - monthly
         - yearly
       limit: 20
+  - source: ./plugins/bluesky-embed
+    enabled: true
+  - source: ./plugins/post-nav
+    enabled: true
+    options:
+      folders:
+        - blog
+        - monthly
+        - yearly
+      labels:
+        prev: « 前の記事
+        next: 次の記事 »
+    layout:
+      position: afterBody
+      priority: 5
+  - source: ./plugins/post-author
+    enabled: true
+    options:
+      folders:
+        - blog
+        - monthly
+        - yearly
+      label: "著者: "
+    layout:
+      position: beforeBody
+      priority: 25
+  - source: ./plugins/iso-dates
+    enabled: true
+    layout:
+      position: afterBody
+      priority: 100
   - source: ./plugins/footer
     enabled: true
     options:

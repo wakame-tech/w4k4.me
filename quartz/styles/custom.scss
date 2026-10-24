@@ -1,3 +1,85 @@
 @use "./variables.scss" as *;
 
 // put your custom CSS here!
+
+// Mermaid reads these theme colors with getPropertyValue() and parses them
+// itself. quartz-themes defines some as `hsl(calc(...))`, which an unregistered
+// custom property returns verbatim and mermaid rejects ("Unsupported color
+// format"), so no diagram renders. Registering them as <color> makes the
+// browser return the computed rgb() value instead.
+@each $name in "secondary", "tertiary", "gray", "light", "lightgray", "highlight", "dark", "darkgray" {
+  @property --#{$name} {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: transparent;
+  }
+}
+
+// quartz-themes renders every tag link as a `display: flex` pill. Inside a
+// body list item that stretches the pill across the whole line; keep it as
+// wide as its text. `html[saved-theme]` outranks the theme's own selector.
+html[saved-theme] body article a.internal-link.tag-link {
+  display: inline-flex;
+}
+
+// In the narrow Properties cell on phones the pills broke inside words, one
+// letter per line. Keep each pill whole and wrap between pills instead.
+.note-properties-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem;
+}
+html[saved-theme] .note-properties-tags a.internal-link.tag-link {
+  white-space: nowrap;
+}
+
+// On phones, full-width images and embeds take over the screen. Cap them at
+// 70% of the column and center them. Post cards clip their content below
+// about 300px, so they keep at least that. The embed scripts set max-width
+// inline, hence !important.
+@media all and #{$mobile} {
+  article img,
+  article video,
+  article iframe {
+    display: block;
+    max-width: 70%;
+    margin-inline: auto;
+  }
+
+  article .bluesky-embed,
+  article .twitter-tweet {
+    max-width: max(70%, 300px) !important;
+    margin-inline: auto !important;
+  }
+
+  // The wrapper above is already capped; don't shrink its iframe again.
+  article .bluesky-embed iframe,
+  article .twitter-tweet iframe {
+    max-width: none;
+  }
+}
+
+// The explorer's server HTML has no `collapsed` class; its script adds one
+// after load on phones. Until then the full-screen menu sits open over the
+// page, then animates shut. Keep it hidden unless the toggle has opened it
+// (the only thing that sets aria-expanded="true").
+@media all and #{$mobile} {
+  html .explorer:not([aria-expanded="true"]) > .explorer-content {
+    visibility: hidden;
+    transform: translateX(-100vw);
+  }
+}
+
+// Tags and backlinks: plain teal-500 text instead of the theme's yellow
+// highlight. The theme's tag rule ties on specificity and loads after this
+// file, hence !important.
+$teal-500: #14b8a6;
+html[saved-theme] body a.internal-link.tag-link,
+html[saved-theme] body .backlinks a.internal {
+  &,
+  &:hover {
+    background-color: transparent !important;
+    color: $teal-500 !important;
+  }
+}
