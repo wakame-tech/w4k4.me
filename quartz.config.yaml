@@ -263,6 +263,11 @@ plugins:
     layout:
       position: beforeBody
       priority: 25
+  - source: ./plugins/iso-dates
+    enabled: true
+    layout:
+      position: afterBody
+      priority: 100
   - source: ./plugins/footer
     enabled: true
     options:

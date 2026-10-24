@@ -28,6 +28,7 @@ jobs:
           ln -sfn ../../plugins/tag-link-text .quartz/plugins/tag-link-text
           ln -sfn ../../plugins/post-nav .quartz/plugins/post-nav
           ln -sfn ../../plugins/post-author .quartz/plugins/post-author
+          ln -sfn ../../plugins/iso-dates .quartz/plugins/iso-dates
       - run: npx quartz plugin install
       - run: npx quartz build -d content/wiki
       - uses: amondnet/vercel-action@v20
