@@ -1,0 +1,42 @@
+{
+  "name": "@w4k4/rss",
+  "version": "1.0.0",
+  "description": "RSS feed of dated posts only, newest first (replaces content-index's RSS)",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "quartz": {
+    "name": "rss",
+    "displayName": "RSS",
+    "category": "emitter",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "folders": ["blog"],
+      "limit": 20,
+      "slug": "index"
+    },
+    "optionSchema": {
+      "folders": {
+        "type": "array"
+      },
+      "limit": {
+        "type": "number"
+      },
+      "slug": {
+        "type": "string"
+      }
+    }
+  }
+}

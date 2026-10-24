@@ -23,6 +23,7 @@ jobs:
         run: |
           mkdir -p .quartz/plugins
           ln -sfn ../../plugins/footer .quartz/plugins/footer
+          ln -sfn ../../plugins/rss .quartz/plugins/rss
       - run: npx quartz plugin install
       - run: npx quartz build -d content/wiki
       - uses: amondnet/vercel-action@v20

@@ -142,7 +142,7 @@ plugins:
     enabled: true
     options:
       enableSiteMap: true
-      enableRSS: true
+      enableRSS: false
   - source: github:quartz-community/favicon
     enabled: true
   - source: github:quartz-community/og-image
@@ -226,6 +226,14 @@ plugins:
     layout:
       position: afterBody
       priority: 10
+  - source: ./plugins/rss
+    enabled: true
+    options:
+      folders:
+        - blog
+        - monthly
+        - yearly
+      limit: 20
   - source: ./plugins/footer
     enabled: true
     options:
