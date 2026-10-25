@@ -69,7 +69,7 @@ const PostNav = (opts) => {
     if (!folder || !folders.includes(folder) || !postDate(fileData)) return null
 
     const posts = allFiles
-      .filter((f) => topFolder(f.slug ?? "") === folder && !f.slug.endsWith("/index"))
+      .filter((f) => topFolder(f.slug ?? "") === folder && f.slug !== `${folder}/index`)
       .map((f) => ({ slug: f.slug, title: f.frontmatter?.title ?? f.slug, date: postDate(f) }))
       .filter((p) => p.date)
       .sort((a, b) => a.date.getTime() - b.date.getTime() || a.slug.localeCompare(b.slug))
@@ -81,7 +81,7 @@ const PostNav = (opts) => {
     if (!prev && !next) return null
 
     const link = (post, kind) =>
-      h("a", { href: relativeHref(slug, post.slug), class: `internal post-nav-${kind}` }, [
+      h("a", { href: relativeHref(slug, post.slug.replace(/(^|\/)index$/, "$1")), class: `internal post-nav-${kind}` }, [
         h("span", { class: "post-nav-label" }, text[kind]),
         h("span", { class: "post-nav-title" }, post.title),
       ])

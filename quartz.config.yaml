@@ -10,11 +10,13 @@ configuration:
   baseUrl: blog.w4k4.me
   ignorePatterns:
     - "**/private/**"
+    - "**/daily/**"
     - "**/lifelog/**"
     - "**/techblog/**"
     - "**/kibela/**"
     - "**/*.base"
     - private
+    - daily
     - lifelog
     - templates
     - .obsidian

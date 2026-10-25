@@ -25,7 +25,9 @@ const escapeXML = (s) =>
 const toPost = (data, folders) => {
   const slug = data.slug ?? ""
   if (!folders.some((f) => slug.startsWith(`${f}/`))) return null
-  if (slug.endsWith("/index") || data.unlisted === true) return null
+  // skip only the top folder listing (e.g. monthly/index); nested index pages
+  // such as monthly/2024/07/index are posts
+  if (folders.some((f) => slug === `${f}/index`) || data.unlisted === true) return null
 
   const fm = data.frontmatter ?? {}
   if (!fm.date) return null
@@ -45,7 +47,7 @@ const renderFeed = (cfg, posts) => {
   const pageTitle = cfg.pageTitle ?? ""
   const items = posts
     .map((p) => {
-      const url = `https://${base}/${encodeURI(p.slug)}`
+      const url = `https://${base}/${encodeURI(p.slug.replace(/(^|\/)index$/, "$1"))}`
       return `<item>
     <title>${escapeXML(p.title)}</title>
     <link>${url}</link>
