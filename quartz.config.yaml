@@ -273,7 +273,8 @@ plugins:
   - source: ./plugins/footer
     enabled: true
     options:
-      links: {}
+      links:
+        RSS: /index.xml
       notice:
         before: "このサイトは "
         linkText: Karpathy LLM Wiki
