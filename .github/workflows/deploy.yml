@@ -29,6 +29,11 @@ jobs:
           ln -sfn ../../plugins/post-nav .quartz/plugins/post-nav
           ln -sfn ../../plugins/post-author .quartz/plugins/post-author
           ln -sfn ../../plugins/iso-dates .quartz/plugins/iso-dates
+      # Refuse to deploy if a published page contains a blacklisted term
+      - name: Publish check
+        working-directory: content
+        run: |
+          if [ -f wiki/scripts/publish_check.py ]; then python3 wiki/scripts/publish_check.py; fi
       - run: npx quartz plugin install
       - run: npx quartz build -d content/wiki
       - uses: amondnet/vercel-action@v20
