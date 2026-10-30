@@ -36,6 +36,7 @@ jobs:
           if [ -f wiki/scripts/publish_check.py ]; then python3 wiki/scripts/publish_check.py; fi
       - run: npx quartz plugin install
       - run: npx quartz build -d content/wiki
+      - run: cp robots.txt public/robots.txt
       - uses: amondnet/vercel-action@v20
         with:
           vercel-token: ${{ secrets.VERCEL_ACCESS_TOKEN }}
