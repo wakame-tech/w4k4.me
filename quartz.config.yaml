@@ -164,6 +164,17 @@ plugins:
     enabled: true
   - source: github:quartz-community/explorer
     enabled: true
+    options:
+      # Date-prefixed names (blog/20250701_*, yearly/2025, monthly/2025/03)
+      # sort newest first; everything else keeps the default title order.
+      sortFn: |
+        (a, b) => {
+          if (a.isFolder !== b.isFolder) return a.isFolder ? -1 : 1;
+          const da = /^\d/.test(a.slugSegment), db = /^\d/.test(b.slugSegment);
+          if (da && db) return b.slugSegment.localeCompare(a.slugSegment, undefined, { numeric: true });
+          if (da !== db) return da ? -1 : 1;
+          return a.displayName.localeCompare(b.displayName, undefined, { numeric: true, sensitivity: "base" });
+        }
     layout:
       position: left
       priority: 50
