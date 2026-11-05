@@ -1,0 +1,27 @@
+{
+  "name": "@w4k4/pele-diagrams",
+  "version": "1.0.0",
+  "description": "Renders mermaid code blocks with Pele",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "quartz": {
+    "name": "pele-diagrams",
+    "displayName": "Pele Diagrams",
+    "category": "transformer",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 35,
+    "defaultEnabled": true,
+    "defaultOptions": {}
+  }
+}
