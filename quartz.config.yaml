@@ -72,7 +72,7 @@ plugins:
       highlight: true
       wikilinks: true
       callouts: true
-      mermaid: true
+      mermaid: false
       parseTags: true
       parseArrows: true
       parseBlockReferences: true
@@ -81,6 +81,9 @@ plugins:
       enableVideoEmbed: true
       enableCheckbox: true
     order: 30
+  - source: ./plugins/pele-diagrams
+    enabled: true
+    order: 35
   - source: github:quartz-community/github-flavored-markdown
     enabled: true
     order: 40

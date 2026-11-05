@@ -29,6 +29,7 @@ jobs:
           ln -sfn ../../plugins/post-nav .quartz/plugins/post-nav
           ln -sfn ../../plugins/post-author .quartz/plugins/post-author
           ln -sfn ../../plugins/iso-dates .quartz/plugins/iso-dates
+          ln -sfn ../../plugins/pele-diagrams .quartz/plugins/pele-diagrams
       # Refuse to deploy if a published page contains a blacklisted term
       - name: Publish check
         working-directory: content
