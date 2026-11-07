@@ -4,6 +4,14 @@ on:
   push:
     branches:
       - main
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+# Let an in-progress deploy finish; queue the newest push behind it
+concurrency:
+  group: pages
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -38,10 +46,15 @@ jobs:
       - run: npx quartz plugin install
       - run: npx quartz build -d content/wiki
       - run: cp robots.txt public/robots.txt
-      - uses: amondnet/vercel-action@v20
+      - uses: actions/upload-pages-artifact@v4
         with:
-          vercel-token: ${{ secrets.VERCEL_ACCESS_TOKEN }}
-          vercel-args: "--prod --archive=tgz"
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID}}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}}
-          working-directory: ./
+          path: public
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
