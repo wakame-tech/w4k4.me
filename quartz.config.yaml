@@ -5,7 +5,8 @@ configuration:
   enableSPA: true
   enablePopovers: true
   analytics:
-    provider: plausible
+    provider: google
+    tagId: G-3YF7PLWMXG
   locale: en-US
   baseUrl: blog.w4k4.me
   ignorePatterns:
