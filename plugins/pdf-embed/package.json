@@ -1,0 +1,27 @@
+{
+  "name": "@w4k4/pdf-embed",
+  "version": "1.0.0",
+  "description": "Embeds PDFs built from Typst and Marp sources",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "quartz": {
+    "name": "pdf-embed",
+    "displayName": "PDF Embed",
+    "category": "transformer",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 36,
+    "defaultEnabled": true,
+    "defaultOptions": {}
+  }
+}
