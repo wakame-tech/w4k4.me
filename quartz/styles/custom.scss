@@ -82,3 +82,11 @@ html[saved-theme] body .backlinks a.internal {
     color: $teal-500 !important;
   }
 }
+
+// A collapsed callout zeroes its children's margins, but heading margins come
+// from a more specific article rule, so a callout holding ### headings kept a
+// tall empty box. Yearly reports fold whole sections this way.
+article .callout.is-collapsed > .callout-content > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
