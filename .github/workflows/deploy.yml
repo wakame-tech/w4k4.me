@@ -38,13 +38,26 @@ jobs:
           ln -sfn ../../plugins/post-author .quartz/plugins/post-author
           ln -sfn ../../plugins/iso-dates .quartz/plugins/iso-dates
           ln -sfn ../../plugins/pele-diagrams .quartz/plugins/pele-diagrams
+          ln -sfn ../../plugins/pdf-embed .quartz/plugins/pdf-embed
       # Refuse to deploy if a published page contains a blacklisted term
       - name: Publish check
         working-directory: content
         run: |
           if [ -f wiki/scripts/publish_check.py ]; then python3 wiki/scripts/publish_check.py; fi
+      # Typst/Marp sources use Hiragino locally; Noto CJK is their fallback here
+      - name: Install CJK fonts
+        run: sudo apt-get update -q && sudo apt-get install -y -q fonts-noto-cjk
+      - uses: typst-community/setup-typst@v4
+        with:
+          typst-version: 0.15.1
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/typst/packages
+          key: typst-packages-${{ hashFiles('content/wiki/**/*.typ') }}
+          restore-keys: typst-packages-
       - run: npx quartz plugin install
       - run: npx quartz build -d content/wiki
+      - run: node scripts/build-pdfs.mjs content/wiki public
       - run: cp robots.txt public/robots.txt
       - uses: actions/upload-pages-artifact@v4
         with:
