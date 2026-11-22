@@ -29,6 +29,12 @@ const style = `.unpublished-tag {
   font-weight: bold;
   line-height: 1.4;
   vertical-align: middle;
+  white-space: nowrap;
+  /* Explorer links are flex rows: keep the tag from stretching to the
+     height of a wrapped title. */
+  flex: none;
+  align-self: center;
+  height: fit-content;
 }`
 
 const script = `
