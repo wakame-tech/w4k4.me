@@ -1,7 +1,7 @@
 {
   "name": "@w4k4/unpublished-banner",
   "version": "1.0.0",
-  "description": "Marks pages without publish: true with a banner, for local previews that include unpublished pages",
+  "description": "Marks pages without publish: true (banner on the page, DRAFT tag in lists) in local previews that include unpublished pages",
   "type": "module",
   "private": true,
   "license": "MIT",
