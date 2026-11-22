@@ -1,0 +1,47 @@
+{
+  "name": "@w4k4/unpublished-banner",
+  "version": "1.0.0",
+  "description": "Marks pages without publish: true with a banner, for local previews that include unpublished pages",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "peerDependencies": {
+    "preact": "^10.0.0"
+  },
+  "quartz": {
+    "name": "unpublished-banner",
+    "displayName": "Unpublished Banner",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "label": "非公開"
+    },
+    "components": {
+      "UnpublishedBanner": {
+        "displayName": "Unpublished Banner",
+        "defaultPosition": "beforeBody",
+        "defaultPriority": 1
+      }
+    },
+    "optionSchema": {
+      "label": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -290,6 +290,12 @@ plugins:
     layout:
       position: beforeBody
       priority: 25
+  # Only renders when explicit-publish is off (scripts/preview-unpublished.sh).
+  - source: ./plugins/unpublished-banner
+    enabled: true
+    layout:
+      position: beforeBody
+      priority: 1
   - source: ./plugins/iso-dates
     enabled: true
     layout:
