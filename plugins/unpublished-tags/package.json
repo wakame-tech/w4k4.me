@@ -1,7 +1,7 @@
 {
-  "name": "@w4k4/unpublished-banner",
+  "name": "@w4k4/unpublished-tags",
   "version": "1.0.0",
-  "description": "Marks pages without publish: true (banner on the page, DRAFT tag in lists) in local previews that include unpublished pages",
+  "description": "Tags pages without publish: true (DRAFT / 非公開) after their title and in page lists, in local previews that include unpublished pages",
   "type": "module",
   "private": true,
   "license": "MIT",
@@ -20,28 +20,22 @@
     "preact": "^10.0.0"
   },
   "quartz": {
-    "name": "unpublished-banner",
-    "displayName": "Unpublished Banner",
+    "name": "unpublished-tags",
+    "displayName": "Unpublished Tags",
     "category": "component",
     "version": "1.0.0",
     "quartzVersion": ">=5.0.0",
     "dependencies": [],
     "defaultOrder": 50,
     "defaultEnabled": true,
-    "defaultOptions": {
-      "label": "非公開"
-    },
+    "defaultOptions": {},
     "components": {
-      "UnpublishedBanner": {
-        "displayName": "Unpublished Banner",
+      "UnpublishedTags": {
+        "displayName": "Unpublished Tags",
         "defaultPosition": "beforeBody",
         "defaultPriority": 1
       }
     },
-    "optionSchema": {
-      "label": {
-        "type": "string"
-      }
-    }
+    "optionSchema": {}
   }
 }

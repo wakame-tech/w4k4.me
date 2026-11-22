@@ -7,33 +7,18 @@ import { h } from "preact"
 // normal build never renders anything from this plugin. scripts/
 // preview-unpublished.sh turns explicit-publish off to preview drafts; there:
 //
-// - a page without `publish: true` gets a banner above its title, and
-// - links to such pages in lists (explorer, folder and tag listings, recent
-//   notes, backlinks) get a tag after their title: "DRAFT" for
-//   `status: draft`, otherwise "非公開".
+// pages without `publish: true` get a tag after their title, both on the page
+// itself and on links to them in lists (explorer, folder and tag listings,
+// recent notes, backlinks): "DRAFT" for `status: draft`, otherwise "非公開".
 //
 // The component knows every page (allFiles), so it embeds the unpublished
 // slugs as JSON and the client script marks matching links. In a normal build
 // allFiles holds only published pages, the list is empty and nothing renders.
 //
-// Generated pages (folder and tag listings) have no source file and no
-// frontmatter of their own, so they never get a banner.
+// Generated pages (folder and tag listings) have no source file, so they are
+// never in the list.
 
-const style = `.unpublished-banner {
-  margin: 0 0 1rem 0;
-  padding: 0.4rem 0.8rem;
-  border: 2px dashed #c0392b;
-  border-radius: 6px;
-  background: rgba(192, 57, 43, 0.12);
-  color: #c0392b;
-  font-weight: bold;
-}
-.unpublished-banner small {
-  margin-left: 0.6rem;
-  font-weight: normal;
-  color: var(--darkgray);
-}
-.unpublished-tag {
+const style = `.unpublished-tag {
   display: inline-block;
   margin-left: 0.4em;
   padding: 0 0.35em;
@@ -58,17 +43,23 @@ function slugOf(href) {
   path = path.replace(/^\\//, "").replace(/\\.html$/, "").replace(/\\/$/, "")
   return path.replace(/\\/index$/, "")
 }
+function makeTag(label) {
+  const tag = document.createElement("span")
+  tag.className = "unpublished-tag"
+  tag.textContent = label
+  return tag
+}
 function markLinks(root) {
   const pages = unpublishedPages()
   if (Object.keys(pages).length === 0) return
+  const title = root.querySelector("h1.article-title")
+  const own = pages[slugOf(location.href)]
+  if (title && own && !title.querySelector(".unpublished-tag")) title.appendChild(makeTag(own))
   for (const a of root.querySelectorAll(LIST_LINKS)) {
     if (a.querySelector(".unpublished-tag")) continue
     const label = pages[slugOf(a.getAttribute("href") || "")]
     if (!label) continue
-    const tag = document.createElement("span")
-    tag.className = "unpublished-tag"
-    tag.textContent = label
-    a.appendChild(tag)
+    a.appendChild(makeTag(label))
   }
 }
 let unpublishedObserver
@@ -94,43 +85,24 @@ function pageSlug(slug) {
   return (slug ?? "").replace(/\/index$/, "").replace(/^index$/, "")
 }
 
-const UnpublishedBanner = (opts) => {
-  const label = opts?.label ?? "非公開"
-
-  const UnpublishedBannerComponent = ({ fileData, allFiles, displayClass }) => {
+const UnpublishedTags = () => {
+  const UnpublishedTagsComponent = ({ allFiles }) => {
     const pages = {}
     for (const file of allFiles ?? []) {
       if (!file.filePath || isPublished(file.frontmatter?.publish)) continue
       pages[pageSlug(file.slug)] = labelFor(file.frontmatter)
     }
-    const children = []
-    if (Object.keys(pages).length > 0) {
-      children.push(
-        h("script", {
-          type: "application/json",
-          id: "unpublished-pages",
-          dangerouslySetInnerHTML: { __html: JSON.stringify(pages).replace(/</g, "\\u003c") },
-        }),
-      )
-    }
-    const fm = fileData.frontmatter ?? {}
-    if (fileData.filePath && !isPublished(fm.publish)) {
-      const status = typeof fm.status === "string" && fm.status ? ` (status: ${fm.status})` : ""
-      children.push(
-        h(
-          "div",
-          { class: `unpublished-banner ${displayClass ?? ""}` },
-          label,
-          h("small", null, `publish: true がないので公開されません${status}`),
-        ),
-      )
-    }
-    return children.length > 0 ? h("div", null, ...children) : null
+    if (Object.keys(pages).length === 0) return null
+    return h("script", {
+      type: "application/json",
+      id: "unpublished-pages",
+      dangerouslySetInnerHTML: { __html: JSON.stringify(pages).replace(/</g, "\\u003c") },
+    })
   }
 
-  UnpublishedBannerComponent.css = style
-  UnpublishedBannerComponent.afterDOMLoaded = script
-  return UnpublishedBannerComponent
+  UnpublishedTagsComponent.css = style
+  UnpublishedTagsComponent.afterDOMLoaded = script
+  return UnpublishedTagsComponent
 }
 
-export { UnpublishedBanner }
+export { UnpublishedTags }

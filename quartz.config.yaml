@@ -291,7 +291,7 @@ plugins:
       position: beforeBody
       priority: 25
   # Only renders when explicit-publish is off (scripts/preview-unpublished.sh).
-  - source: ./plugins/unpublished-banner
+  - source: ./plugins/unpublished-tags
     enabled: true
     layout:
       position: beforeBody
