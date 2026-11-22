@@ -39,6 +39,7 @@ jobs:
           ln -sfn ../../plugins/iso-dates .quartz/plugins/iso-dates
           ln -sfn ../../plugins/pele-diagrams .quartz/plugins/pele-diagrams
           ln -sfn ../../plugins/pdf-embed .quartz/plugins/pdf-embed
+          ln -sfn ../../plugins/unpublished-tags .quartz/plugins/unpublished-tags
       # Refuse to deploy if a published page contains a blacklisted term
       - name: Publish check
         working-directory: content

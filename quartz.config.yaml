@@ -68,6 +68,10 @@ plugins:
         light: github-light
         dark: github-dark
       keepBackground: false
+      # Token classification asks Shiki for per-token scope data, about 5s of
+      # the ~8s highlighting takes on the full wiki. Code colors stay the same
+      # without it; only quartz-themes' italic comments go away.
+      tokenClassification: false
     order: 20
   - source: github:quartz-community/obsidian-flavored-markdown
     enabled: true
@@ -290,6 +294,12 @@ plugins:
     layout:
       position: beforeBody
       priority: 25
+  # Only renders when explicit-publish is off (scripts/preview-unpublished.sh).
+  - source: ./plugins/unpublished-tags
+    enabled: true
+    layout:
+      position: beforeBody
+      priority: 1
   - source: ./plugins/iso-dates
     enabled: true
     layout:

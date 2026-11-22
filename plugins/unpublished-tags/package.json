@@ -1,0 +1,41 @@
+{
+  "name": "@w4k4/unpublished-tags",
+  "version": "1.0.0",
+  "description": "Tags pages without publish: true (DRAFT / 非公開) after their title and in page lists, in local previews that include unpublished pages",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "peerDependencies": {
+    "preact": "^10.0.0"
+  },
+  "quartz": {
+    "name": "unpublished-tags",
+    "displayName": "Unpublished Tags",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {},
+    "components": {
+      "UnpublishedTags": {
+        "displayName": "Unpublished Tags",
+        "defaultPosition": "beforeBody",
+        "defaultPriority": 1
+      }
+    },
+    "optionSchema": {}
+  }
+}
