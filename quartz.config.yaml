@@ -213,6 +213,10 @@ plugins:
       priority: 10
   - source: github:quartz-community/content-meta
     enabled: true
+    options:
+      # reading-time assumes 200 words (= CJK characters) per minute, far too
+      # slow for Japanese, and the speed can't be configured.
+      showReadingTime: false
     layout:
       position: beforeBody
       priority: 20
