@@ -90,3 +90,116 @@ article .callout.is-collapsed > .callout-content > * {
   margin-top: 0;
   margin-bottom: 0;
 }
+
+// Chat-style callout, after Omocoro's chat layout: a round icon on the
+// left, the speaker name above the bubble. Everything is written in the
+// post, so a new speaker needs no CSS:
+//   > [!chat] ![](../_paste/icon.webp) 水瀬   image icon
+//   > [!chat] 🦇 コウモリ                      emoji icon (first character)
+//   > [!chat|gm] ...                           accent color (e.g. the GM)
+//   > [!chat|right] ...                        bubble on the right
+//   > [!dice]                                  roll log, compact box, no title
+html[saved-theme] body article .callout[data-callout="chat"] {
+  --color: #8a8a8a;
+  --border: #8a8a8a55;
+  --bg: transparent;
+  --tint: #8a8a8a10;
+  position: relative;
+  min-height: 52px;
+  margin: 0.9rem 0;
+  padding: 0 0 0 64px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  overflow: visible;
+
+  &[data-callout-metadata~="gm"] {
+    --color: #c2417a;
+    --border: #c2417a55;
+    --tint: #c2417a14;
+  }
+
+  & > .callout-title {
+    padding: 0 0 0.15rem;
+    gap: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    & > .callout-icon {
+      display: none;
+    }
+    & > .callout-title-inner > p {
+      color: var(--darkgray);
+      & > img {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 52px;
+        height: 52px;
+        margin: 0;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        box-sizing: border-box;
+        object-fit: cover;
+        background-color: var(--light);
+      }
+    }
+  }
+  // No image: the first character (an emoji) becomes the round icon.
+  &:not(:has(.callout-title-inner img)) > .callout-title > .callout-title-inner > p::first-letter {
+    float: left;
+    // negative bottom margin so the float does not push the bubble down
+    margin: -0.1rem 0 -44px -64px;
+    padding: 11px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background-color: var(--light);
+    font-size: 24px;
+    line-height: 26px;
+  }
+  & > .callout-content {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 3px 14px 14px 14px;
+    background-color: var(--tint);
+    & > p {
+      margin: 0.15rem 0;
+    }
+  }
+
+  &[data-callout-metadata~="right"] {
+    padding: 0 64px 0 0;
+    text-align: right;
+    & > .callout-title > .callout-title-inner > p > img {
+      left: auto;
+      right: 0;
+    }
+    & > .callout-content {
+      margin-left: auto;
+      text-align: left;
+      border-radius: 14px 3px 14px 14px;
+    }
+  }
+}
+
+html[saved-theme] body article .callout[data-callout="dice"] {
+  --color: var(--darkgray);
+  --border: var(--lightgray);
+  --bg: transparent;
+  width: fit-content;
+  max-width: calc(100% - 64px);
+  margin: 0.4rem 0 0.4rem 64px;
+  padding: 0.25rem 0.8rem;
+  border: 1px dashed var(--border);
+  background-color: var(--bg);
+  font-family: var(--codeFont), ui-monospace, monospace;
+  font-size: 0.82rem;
+  & > .callout-title {
+    display: none;
+  }
+  & > .callout-content > p {
+    margin: 0.1rem 0;
+  }
+}
