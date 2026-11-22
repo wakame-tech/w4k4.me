@@ -203,3 +203,35 @@ html[saved-theme] body article .callout[data-callout="dice"] {
     margin: 0.1rem 0;
   }
 }
+
+// Generic aside box for side notes inside a post. The author writes the
+// emoji and label as the callout title, e.g.
+//   > [!aside] 🔍 ログを読み返したら
+//   > [!aside] 💡 補足
+// ("aside" is not one of Quartz's callout aliases, unlike "check".)
+html[saved-theme] body article .callout[data-callout="aside"] {
+  --color: #b7791f;
+  --border: #b7791f66;
+  --bg: #b7791f0f;
+  margin: 0.9rem 0 1.2rem;
+  padding: 0.1rem 0.9rem 0.5rem;
+  border: none;
+  border-left: 4px solid var(--color);
+  border-radius: 0 6px 6px 0;
+  background-color: var(--bg);
+  font-size: 0.92em;
+  & > .callout-title {
+    padding: 0.4rem 0 0.1rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    & > .callout-icon {
+      display: none;
+    }
+    & > .callout-title-inner > p {
+      color: var(--color);
+    }
+  }
+  & > .callout-content > p {
+    margin: 0.3rem 0;
+  }
+}
