@@ -235,3 +235,24 @@ html[saved-theme] body article .callout[data-callout="aside"] {
     margin: 0.3rem 0;
   }
 }
+
+// Table of contents: no per-depth rule reaches the page, so every entry sat
+// flush left and h2/h3 looked the same. Indent by depth and weight the top
+// level (depth is relative: the page's highest heading is depth-0).
+html[saved-theme] .toc ul.toc-content li {
+  @for $i from 1 through 5 {
+    &.depth-#{$i} {
+      padding-left: calc(0.9rem * #{$i});
+    }
+  }
+  &.depth-0 {
+    margin-top: 0.35rem;
+    & > a {
+      font-weight: 700;
+    }
+  }
+  &:not(.depth-0) > a {
+    font-size: 0.92em;
+    font-weight: 400;
+  }
+}
