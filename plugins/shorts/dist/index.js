@@ -284,7 +284,8 @@ const renderPage = (cfg, slug) => {
 <meta name="robots" content="noindex">
 <style>
 :root { --bg:#0e0e10; --fg:#f2f2f2; --muted:#a8a8b0; --accent:#8fb8ff; --chip:#ffffff1f; }
-@media (prefers-color-scheme: light) { :root { --bg:#f4f4f6; --fg:#16161a; --muted:#5a5a66; --accent:#2457c5; --chip:#0000000f; } }
+/* always dark, like video apps: light images on a light page washed out the text */
+:root { color-scheme: dark; }
 * { box-sizing: border-box; }
 html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
   font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; }
@@ -293,7 +294,10 @@ html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
 .card { position:relative; height:100dvh; scroll-snap-align:start; scroll-snap-stop:always;
   display:flex; flex-direction:column; justify-content:center; overflow:hidden; }
 .card .bg { position:absolute; inset:-40px; background-size:cover; background-position:center;
-  filter: blur(32px) brightness(.45); z-index:0; }
+  filter: blur(32px) brightness(.35) saturate(1.2); z-index:0; }
+/* keep the blurred backdrop dark even behind a white image */
+.card.has-img::after { content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background: linear-gradient(to bottom, #0006, #000a 55%, #000c); }
 .card .inner { position:relative; z-index:1; width:min(640px, 100%); margin:0 auto;
   padding: 56px 20px calc(150px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:14px; max-height:100%; }
 .card.has-img { color:#f2f2f2; --accent:#b9d2ff; --muted:#c8c8d0; --chip:#ffffff26; }
