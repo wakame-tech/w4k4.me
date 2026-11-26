@@ -297,3 +297,49 @@ html[saved-theme] body ul.tags {
     padding: 0;
   }
 }
+
+// Folder/tag page rows: tags stacked down a third column, so a post with
+// four tags made its row ~1.7x taller. Put them on one line under the title
+// instead, fading out what doesn't fit, so rows keep the same height.
+// Popovers keep hiding tags (rule below; ours would otherwise win).
+li.section-li > .section {
+  grid-template-columns: fit-content(8em) minmax(0, 1fr);
+  & > .desc {
+    grid-column: 2;
+  }
+  & > ul.tags {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.7em;
+    margin: 0.15rem 0 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 0.85em;
+    mask-image: linear-gradient(to right, #000 85%, transparent);
+    & > li {
+      margin: 0;
+      flex-shrink: 0;
+    }
+  }
+}
+@media all and (max-width: 600px) {
+  li.section-li > .section > ul.tags {
+    display: flex;
+  }
+}
+.popover li.section-li > .section > ul.tags {
+  display: none;
+}
+// The theme gives the row title 16px margins and the row none, which put the
+// tag line closer to the next row than to its own title.
+html[saved-theme] body li.section-li {
+  margin-bottom: 1.1rem;
+  & > .section > .desc > h3,
+  & > .section > .meta {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
