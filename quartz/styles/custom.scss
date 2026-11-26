@@ -346,7 +346,23 @@ html[saved-theme] body li.section-li {
   }
 }
 
-// "29 items under this folder." / "6 items with this tag." add nothing.
+// "29 items under this folder." / "6 items with this tag." add nothing. The
+// tag index (/tags) keeps it: under each tag heading it says "Showing first
+// 10" when the list is cut short.
 .page-listing > p:first-child {
   display: none;
+}
+h2 + .page-listing > p:first-child {
+  display: block;
+}
+
+// Wide display math ran off the right edge on phones and scrolled the whole
+// page sideways; scroll the formula on its own instead.
+// The padding (taken back from the margin) leaves room for glyphs that poke
+// 2-4px outside the box, which overflow-y: hidden would otherwise clip.
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35em 0;
+  margin: 0.65em 0;
 }
