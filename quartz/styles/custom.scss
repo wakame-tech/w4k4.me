@@ -256,3 +256,9 @@ html[saved-theme] .toc ul.toc-content li {
     font-weight: 400;
   }
 }
+
+// Explorer: top-level folders start with a chevron, top-level files (e.g.
+// 自己紹介) don't, so files sat 25px left of the folder names. Line them up.
+.explorer ul.explorer-ul > li > a.nav-file-title {
+  padding-left: 25px;
+}
