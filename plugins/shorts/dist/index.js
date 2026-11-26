@@ -113,6 +113,75 @@ const measure = (nodes, slug) => {
   return { text, lead, end }
 }
 
+// Code blocks: rehype-pretty-code renders <pre><code> with one
+// span[data-line] per line and a shiki colour per token. Keep the text and
+// the dark-theme colour (cards are always dark); nothing else.
+const CODE_LINES = 12 // lines per unit; longer blocks are split
+const CODE_LINE_WEIGHT = 15 // a code line counts as this many chars of text
+const HEX = /^#[0-9a-fA-F]{3,8}$/
+
+const rawText = (node) =>
+  node.type === "text" ? node.value : (node.children ?? []).map(rawText).join("")
+
+const darkColor = (node) => {
+  const style = typeof node.properties?.style === "string" ? node.properties.style : ""
+  const m = style.match(/--shiki-dark:\s*([^;]+)/)
+  return m && HEX.test(m[1].trim()) ? m[1].trim() : null
+}
+
+const parseCode = (pre) => {
+  const code = (pre.children ?? []).find((c) => c.type === "element" && c.tagName === "code")
+  if (!code) return null
+  const lang = code.properties?.dataLanguage ?? pre.properties?.dataLanguage ?? null
+  if (lang === "mermaid") return null
+  const lineNodes = (code.children ?? []).filter((c) => c.type === "element" && c.tagName === "span")
+  let lines = lineNodes.length
+    ? lineNodes.map((ln) =>
+        (ln.children ?? []).map((t) => ({ text: rawText(t), color: t.type === "element" ? darkColor(t) : null })),
+      )
+    : rawText(code).split("\n").map((text) => [{ text, color: null }])
+  const textOf = (line) => line.map((t) => t.text).join("")
+  // trim blank lines at both ends and the common indentation
+  while (lines.length && !textOf(lines[0]).trim()) lines.shift()
+  while (lines.length && !textOf(lines[lines.length - 1]).trim()) lines.pop()
+  if (!lines.length) return null
+  const indent = Math.min(...lines.filter((l) => textOf(l).trim()).map((l) => textOf(l).match(/^ */)[0].length))
+  if (indent > 0)
+    lines = lines.map((line) => {
+      let cut = indent
+      return line.map((t) => {
+        const n = Math.min(cut, t.text.match(/^ */)[0].length)
+        cut -= n
+        return { ...t, text: t.text.slice(n) }
+      })
+    })
+  return { lang, lines }
+}
+
+const renderCode = (lines, contBefore, contAfter) => {
+  const body = lines
+    .map((line) =>
+      line
+        .map((t) => (t.color ? `<span style="color:${t.color}">${escapeHTML(t.text)}</span>` : escapeHTML(t.text)))
+        .join(""),
+    )
+    .join("\n")
+  const cont = '<span class="cont">⋯</span>'
+  return `<pre><code>${contBefore ? cont + "\n" : ""}${body}${contAfter ? "\n" + cont : ""}</code></pre>`
+}
+
+// Embeds: a YouTube iframe becomes its thumbnail (an image block flagged as
+// video); an X/Bluesky blockquote becomes a quote block with its author line.
+const youtubeId = (src) => {
+  const m = typeof src === "string" && src.match(/(?:youtube(?:-nocookie)?\.com\/embed\/|youtu\.be\/)([\w-]{6,})/)
+  return m ? m[1] : null
+}
+const videoBlock = (node) => {
+  const id = node.tagName === "iframe" ? youtubeId(node.properties?.src) : null
+  return id ? { type: "img", src: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, video: true } : null
+}
+const EMBED_CLASSES = { "twitter-tweet": "x", "bluesky-embed": "bluesky" }
+
 // Flatten the document into an ordered list of headings, text blocks and images.
 const collectBlocks = (root, slug) => {
   const blocks = []
@@ -123,6 +192,32 @@ const collectBlocks = (root, slug) => {
       if (tag === "img") {
         const src = node.properties?.src
         if (typeof src === "string" && src) blocks.push({ type: "img", src })
+        return
+      }
+      const video = videoBlock(node)
+      if (video) {
+        blocks.push(video)
+        return
+      }
+      const embed = tag === "blockquote" && classList(node).map((c) => EMBED_CLASSES[c]).find(Boolean)
+      if (embed) {
+        const kids = node.children ?? []
+        const ps = kids.filter((c) => c.type === "element" && c.tagName === "p")
+        const author = kids
+          .filter((c) => !ps.includes(c))
+          .map(textOf)
+          .join("")
+          .replace(/\s+/g, " ")
+          .trim()
+        const br = { type: "element", tagName: "br", properties: {}, children: [] }
+        const nodes = ps.flatMap((p, i) => (i ? [br, ...(p.children ?? [])] : p.children ?? []))
+        const m = measure(nodes, slug)
+        if (m.end > m.lead) blocks.push({ type: "p", embed, author, nodes, ...m })
+        return
+      }
+      if (tag === "pre") {
+        const code = parseCode(node)
+        if (code) blocks.push({ type: "code", ...code })
         return
       }
       if (isSkipped(node)) return
@@ -137,6 +232,8 @@ const collectBlocks = (root, slug) => {
           if (n.type !== "element") return
           if (n.tagName === "img" && typeof n.properties?.src === "string")
             blocks.push({ type: "img", src: n.properties.src })
+          const v = videoBlock(n)
+          if (v) blocks.push(v)
           ;(n.children ?? []).forEach(findImgs)
         }
         findImgs(node)
@@ -160,6 +257,12 @@ const SENTENCE_END = /[。！？!?]|\.(?=\s)/g
 
 // Split one block into units of at most max chars, at sentence ends when it can.
 const toUnits = (block, index, { minChars, maxChars }) => {
+  if (block.type === "code") {
+    const units = []
+    for (let i = 0; i < block.lines.length; i += CODE_LINES)
+      units.push({ block, index, code: true, from: i, to: Math.min(i + CODE_LINES, block.lines.length) })
+    return units
+  }
   const { text, lead, end } = block
   if (end - lead <= maxChars) return [{ block, index, from: lead, to: end }]
   const stops = [...text.matchAll(SENTENCE_END)].map((m) => m.index + 1)
@@ -176,18 +279,26 @@ const toUnits = (block, index, { minChars, maxChars }) => {
   return units
 }
 
-const unitLen = (u) => u.to - u.from
+const unitLen = (u) => (u.code ? (u.to - u.from) * CODE_LINE_WEIGHT : u.to - u.from)
 const passageLen = (units) => units.reduce((n, u) => n + unitLen(u), 0)
 
 const renderUnits = (units, slug) =>
   units
     .map((u) => {
       const { block } = u
+      if (u.code) return renderCode(block.lines.slice(u.from, u.to), u.from > 0, u.to < block.lines.length)
       const state = { from: u.from, to: u.to, pos: 0, text: "" }
       let inner = toHTML(block.nodes, slug, state).trim()
       if (!inner) return ""
       if (u.from > block.lead) inner = "…" + inner
       if (u.to < block.end) inner += "…"
+      if (block.embed) {
+        // image-only posts have just a "[image or embed]" link as their text
+        if (block.text.trim() === "[image or embed]") inner = '<span class="ph">画像付きの投稿</span>'
+        const label = block.embed === "x" ? "𝕏" : "Bluesky"
+        const cite = u.to >= block.end ? `<cite>${label} ${escapeHTML(block.author)}</cite>` : ""
+        return `<blockquote class="embed ${block.embed}"><p>${inner}</p>${cite}</blockquote>`
+      }
       return block.li ? `<p class="li">${inner}</p>` : `<p>${inner}</p>`
     })
     .join("")
@@ -195,14 +306,14 @@ const renderUnits = (units, slug) =>
 // Nearest image to blocks [start, end], not crossing a heading: inside, then
 // up to two blocks after, then up to two before.
 const nearestImage = (blocks, start, end) => {
-  for (let i = start; i <= end; i++) if (blocks[i].type === "img") return blocks[i].src
+  for (let i = start; i <= end; i++) if (blocks[i].type === "img") return blocks[i]
   for (let i = end + 1; i <= end + 2 && i < blocks.length; i++) {
     if (blocks[i].type === "h") break
-    if (blocks[i].type === "img") return blocks[i].src
+    if (blocks[i].type === "img") return blocks[i]
   }
   for (let i = start - 1; i >= start - 2 && i >= 0; i--) {
     if (blocks[i].type === "h") break
-    if (blocks[i].type === "img") return blocks[i].src
+    if (blocks[i].type === "img") return blocks[i]
   }
   return null
 }
@@ -240,7 +351,8 @@ const toPassages = (blocks, slug, title, options) => {
         html: renderUnits(units, slug),
         heading: section.heading && section.heading !== title ? section.heading : null,
         anchor: section.anchor,
-        image: image ? resolveUrl(image, slug) : null,
+        image: image ? resolveUrl(image.src, slug) : null,
+        ...(image?.video ? { video: true } : {}),
         len: passageLen(units),
       })
     }
@@ -250,7 +362,7 @@ const toPassages = (blocks, slug, title, options) => {
     if (b.type === "h") {
       closeSection()
       section = { heading: b.text, anchor: b.id, units: [] }
-    } else if (b.type === "p") {
+    } else if (b.type === "p" || b.type === "code") {
       section.units.push(...toUnits(b, i, options))
     }
   })
@@ -282,83 +394,126 @@ const renderPage = (cfg, slug) => {
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${title}</title>
 <meta name="robots" content="noindex">
+<script>
+(() => {
+  const root = document.documentElement
+  if (root.hasAttribute("saved-theme")) return
+  let theme = null
+  try { theme = localStorage.getItem("theme") } catch (e) {}
+  root.setAttribute("saved-theme", theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"))
+})()
+</script>
 <style>
-:root { --bg:#0e0e10; --fg:#f2f2f2; --muted:#a8a8b0; --accent:#8fb8ff; --chip:#ffffff1f; }
-/* always dark, like video apps: light images on a light page washed out the text */
-:root { color-scheme: dark; }
-* { box-sizing: border-box; }
-html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
-  font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; }
-#feed { height:100dvh; overflow-y:auto; scroll-snap-type:y mandatory; overscroll-behavior:contain; scrollbar-width:none; }
-#feed::-webkit-scrollbar { display:none; }
-.card { position:relative; height:100dvh; scroll-snap-align:start; scroll-snap-stop:always;
+/* Everything lives under #shorts so the page looks the same whether it is
+   loaded on its own or swapped in by Quartz's SPA router (which keeps the
+   site's stylesheets). Colours follow the site theme (saved-theme, like
+   Quartz): Quartz's variables when present, the same values otherwise.
+   Passage text uses the heading colour (--dark): the body grey is too faint
+   at this size. Image cards stay dark in both themes. */
+#shorts, #shorts * { box-sizing: border-box; }
+#shorts { position:fixed; inset:0; z-index:0; margin:0; background:var(--bg); color:var(--fg);
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --bg: var(--light, #1c1c1c); --fg: var(--dark, #dadada); --muted: var(--gray, #b3b3b3);
+  --accent: var(--secondary, #a68af9); --chip: #ffffff1f; color-scheme: dark; }
+html[saved-theme="light"] #shorts { --bg: var(--light, #ffffff); --fg: var(--dark, #222222);
+  --muted: var(--gray, #5c5c5c); --accent: var(--secondary, #8a5cf5); --chip: #0000000f; color-scheme: light; }
+html, body { margin:0; height:100%; background:var(--light, #1c1c1c); }
+html[saved-theme="light"] body { background:var(--light, #ffffff); }
+#shorts #feed { height:100dvh; overflow-y:auto; scroll-snap-type:y mandatory; overscroll-behavior:contain; scrollbar-width:none; }
+#shorts #feed::-webkit-scrollbar { display:none; }
+#shorts .card { position:relative; height:100dvh; scroll-snap-align:start; scroll-snap-stop:always;
   display:flex; flex-direction:column; justify-content:center; overflow:hidden; }
-.card .bg { position:absolute; inset:-40px; background-size:cover; background-position:center;
+#shorts .card .bg { position:absolute; inset:-40px; background-size:cover; background-position:center;
   filter: blur(32px) brightness(.35) saturate(1.2); z-index:0; }
 /* keep the blurred backdrop dark even behind a white image */
-.card.has-img::after { content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+#shorts .card.has-img::after { content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
   background: linear-gradient(to bottom, #0006, #000a 55%, #000c); }
-.card .inner { position:relative; z-index:1; width:min(640px, 100%); margin:0 auto;
-  padding: 56px 20px calc(150px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:14px; max-height:100%; }
-.card.has-img { color:#f2f2f2; --accent:#b9d2ff; --muted:#c8c8d0; --chip:#ffffff26; }
+#shorts .card .inner { position:relative; z-index:1; width:min(640px, 100%); margin:0 auto;
+  padding: 56px 20px calc(136px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:14px; max-height:100%; }
+#shorts .card.has-img { color:#f2f2f2; --fg:#f2f2f2; --accent:#c5b6fc; --muted:#c8c8d0; --chip:#ffffff26; }
 
 /* image with a slow Ken Burns pan while the card is on screen */
 /* the image gives way to the text: it shrinks, the text does not */
-.card .picwrap { overflow:hidden; border-radius:12px; background:#0003; flex:0 1 auto; min-height:0; display:flex; }
-.card img.pic { display:block; width:100%; height:auto; max-height:44dvh; min-height:0; object-fit:contain; transform-origin: var(--ox, 50%) var(--oy, 50%); }
-.card.long img.pic { max-height:26dvh; }
-.card.active img.pic { animation: kb 14s ease-in-out infinite alternate; }
-.card.active .bg { animation: kbbg 20s ease-in-out infinite alternate; }
+#shorts .card .picwrap { overflow:hidden; border-radius:12px; background:#0003; flex:0 1 auto; min-height:0; display:flex; }
+#shorts .card img.pic { display:block; width:100%; height:auto; max-height:44dvh; min-height:0; object-fit:contain; transform-origin: var(--ox, 50%) var(--oy, 50%); }
+#shorts .card.long img.pic { max-height:26dvh; }
+#shorts .card.active img.pic { animation: kb 14s ease-in-out infinite alternate; }
+#shorts .card.active .bg { animation: kbbg 20s ease-in-out infinite alternate; }
 @keyframes kb { from { transform: scale(1) translate(0,0); } to { transform: scale(1.14) translate(var(--tx, -2%), var(--ty, -2%)); } }
 @keyframes kbbg { from { transform: scale(1); } to { transform: scale(1.1); } }
-@media (prefers-reduced-motion: reduce) { .card.active img.pic, .card.active .bg { animation:none; } }
+/* Fixed image box so long text can't squeeze the image to a sliver. Very
+   wide images (panoramas, wide screenshots) would still be a thin strip at
+   full width: fill the box and pan across them instead. */
+#shorts .card .picwrap { flex:0 0 auto; height:var(--pic-h, 30dvh); align-items:center; justify-content:center; }
+#shorts .card img.pic { height:100%; max-height:none; object-fit:contain; }
+#shorts .card img.pic.wide { object-fit:cover; object-position:0% 50%; }
+#shorts .card.active img.pic.wide { animation: kbwide 12s ease-in-out infinite alternate; }
+@keyframes kbwide { from { object-position:0% 50%; } to { object-position:100% 50%; } }
+@media (prefers-reduced-motion: reduce) { #shorts .card.active img.pic, #shorts .card.active img.pic.wide, #shorts .card.active .bg { animation:none; } }
 
-.card .crumb { font-size:13px; color:var(--muted); display:flex; gap:8px; align-items:center; min-width:0; }
-.card .crumb .h { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.card .crumb .n { margin-left:auto; font-variant-numeric: tabular-nums; flex-shrink:0; }
-.card .text { font-size: clamp(17px, 4.4vw, 21px); line-height:1.8; word-break:break-word; overflow:auto; flex:0 0 auto; }
-.card.has-img .text { max-height:none; }
-.card.no-img .text { font-size: clamp(19px, 5.2vw, 25px); }
-.card.long .text, .card.no-img.long .text { font-size: clamp(15px, 4.1vw, 19px); line-height:1.7; }
-.card .text p { margin:0 0 .6em; }
-.card .text p:last-child { margin-bottom:0; }
-.card .text p.li { padding-left:1.1em; text-indent:-1.1em; margin-bottom:.25em; }
-.card .text p.li::before { content:"・"; display:inline-block; width:1.1em; text-indent:0; }
-.card .text a { color:var(--accent); text-decoration:underline; text-underline-offset:3px; pointer-events:none; }
-.card .text code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.85em;
+#shorts .card .crumb { font-size:13px; color:var(--muted); display:flex; gap:8px; align-items:center; min-width:0; }
+#shorts .card .crumb .h { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#shorts .card .crumb .n { margin-left:auto; font-variant-numeric: tabular-nums; flex-shrink:0; }
+#shorts .card .text { font-size: clamp(17px, 4.4vw, 21px); line-height:1.8; word-break:break-word; overflow:auto; flex:0 0 auto; }
+#shorts .card.has-img .text { max-height:none; }
+#shorts .card.no-img .text { font-size: clamp(19px, 5.2vw, 25px); }
+#shorts .card.long .text, #shorts .card.no-img.long .text { font-size: clamp(15px, 4.1vw, 19px); line-height:1.7; }
+#shorts .card .text, #shorts .card .text p { color:var(--fg); }
+#shorts .card .text p { margin:0 0 .6em; }
+#shorts .card .text p:last-child { margin-bottom:0; }
+#shorts .card .text p.li { padding-left:1.1em; text-indent:-1.1em; margin-bottom:.25em; }
+#shorts .card .text p.li::before { content:"・"; display:inline-block; width:1.1em; text-indent:0; }
+#shorts .card .text a { color:var(--accent); text-decoration:underline; text-underline-offset:3px; pointer-events:none; }
+#shorts .card .text code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.85em;
   background:#8883; padding:.1em .35em; border-radius:4px; }
-.card .text mark { background:#ffe06680; color:inherit; padding:0 .15em; }
+#shorts .card .text pre { margin:0 0 .6em; padding:10px 12px; background:#000a; border-radius:8px; overflow-x:auto;
+  font: 12.5px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; color:#e1e4e8; white-space:pre; }
+#shorts .card .text pre:last-child { margin-bottom:0; }
+#shorts .card .text pre code { background:none; padding:0; font-size:inherit; }
+#shorts .card .text pre .cont { color:#8b949e; }
+#shorts .card .text blockquote.embed { margin:0 0 .6em; padding:12px 14px; border-radius:10px;
+  border-left:3px solid var(--accent); background: color-mix(in srgb, var(--fg) 7%, transparent); }
+#shorts .card .text blockquote.embed:last-child { margin-bottom:0; }
+#shorts .card .text blockquote.embed p { margin:0; }
+#shorts .card .text blockquote.embed .ph { color:var(--muted); font-style:italic; }
+#shorts .card .text blockquote.embed cite { display:block; margin-top:6px; font-style:normal; font-size:13px; color:var(--muted); }
+#shorts .card .picwrap { position:relative; }
+#shorts .card .vbadge { position:absolute; left:8px; bottom:8px; padding:3px 8px; border-radius:6px;
+  background:#000c; color:#fff; font-size:12px; font-weight:600; }
+#shorts .card .text mark { background:#ffe06680; color:inherit; padding:0 .15em; }
 
 /* bottom-left meta, video-caption style */
-.card .meta { position:absolute; z-index:2; display:flex; flex-direction:column; gap:6px; font-size:14px; min-width:0;
+#shorts .card .meta { position:absolute; z-index:2; display:flex; flex-direction:column; gap:6px; font-size:14px; min-width:0;
   left:max(20px, calc(50% - 300px)); right:max(80px, calc(50% - 300px)); bottom:calc(20px + env(safe-area-inset-bottom)); }
-.card.has-img .meta { text-shadow: 0 1px 3px #0008; }
-.card .meta .title { color:inherit; font-weight:700; font-size:15px; text-decoration:none;
+#shorts .card.has-img .meta { text-shadow: 0 1px 3px #0008; }
+#shorts .card .meta .title { color:inherit; font-weight:700; font-size:15px; text-decoration:none;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.card .meta .sub { display:flex; flex-wrap:wrap; gap:6px; align-items:center; color:var(--muted); font-size:13px; }
-.card .meta .chip { color:inherit; text-decoration:none; background:var(--chip); padding:2px 8px; border-radius:999px; }
-.card .meta .read { color:var(--accent); text-decoration:none; font-weight:600; align-self:flex-start; }
+#shorts .card .meta .sub { display:flex; flex-wrap:wrap; gap:6px; align-items:center; color:var(--muted); font-size:13px; }
+#shorts .card .meta .chip { color:inherit; text-decoration:none; background:var(--chip); padding:2px 8px; border-radius:999px; }
+#shorts .card .meta .read { color:var(--accent); text-decoration:none; font-weight:600; align-self:flex-start; }
 
-.fab { position:fixed; z-index:10; border:0; background:#0008; color:#fff; border-radius:999px;
+#shorts .fab { position:fixed; z-index:10; border:0; background:#0008; color:#fff; border-radius:999px;
   font: 14px system-ui, sans-serif; text-decoration:none; padding:6px 12px; cursor:pointer; }
-#home { top:12px; left:12px; }
-#filter { top:12px; right:12px; }
-#play { right:16px; bottom:calc(20px + env(safe-area-inset-bottom)); width:48px; height:48px; padding:0; font-size:18px; }
-#playbar { position:fixed; left:0; bottom:0; height:3px; width:0; background:var(--accent); z-index:10; }
-#flash { position:fixed; left:50%; top:50%; width:72px; height:72px; margin:-36px 0 0 -36px; z-index:11;
+#shorts #home { top:12px; left:12px; }
+#shorts #filter { top:12px; right:12px; }
+#shorts #play { right:16px; bottom:calc(20px + env(safe-area-inset-bottom)); width:48px; height:48px; padding:0; font-size:18px; }
+#shorts #playbar { position:fixed; left:0; bottom:0; height:3px; width:0; background:var(--accent); z-index:10; }
+#shorts #flash { position:fixed; left:50%; top:50%; width:72px; height:72px; margin:-36px 0 0 -36px; z-index:11;
   display:grid; place-items:center; border-radius:999px; background:#0009; color:#fff; font-size:28px;
   opacity:0; pointer-events:none; transition: opacity .4s, transform .4s; transform: scale(.8); }
-#flash.show { opacity:1; transform: scale(1); transition: none; }
-#status { position:fixed; inset:0; display:grid; place-items:center; color:var(--muted); text-align:center; padding:16px; }
+#shorts #flash.show { opacity:1; transform: scale(1); transition: none; }
+#shorts #status { position:fixed; inset:0; display:grid; place-items:center; color:var(--muted); text-align:center; padding:16px; }
 </style>
 </head>
 <body>
+<div id="shorts">
 <a id="home" class="fab" href="${base}">← ${cfg.pageTitle ?? "home"}</a>
 <div id="status">読み込み中…</div>
 <main id="feed"></main>
 <button id="play" class="fab" type="button" aria-label="自動再生">▶</button>
 <div id="playbar"></div>
 <div id="flash"></div>
+</div>
 <script>
 (async () => {
   const feed = document.getElementById("feed")
@@ -421,7 +576,7 @@ html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
     f.className = "fab"
     f.href = location.pathname
     f.textContent = "#" + tag + "  ✕"
-    document.body.append(f)
+    document.getElementById("shorts").append(f)
   }
 
   const abs = (p) => (/^(https?:|data:)/.test(p) ? p : "${base}" + p.replace(/^\\//, ""))
@@ -443,15 +598,21 @@ html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
     const inner = el("div", "inner")
     if (it.image) {
       const wrap = el("div", "picwrap")
+      // the shorter the passage, the taller the image box
+      wrap.style.setProperty("--pic-h", (it.len <= 100 ? 40 : it.len <= 160 ? 30 : it.len <= 220 ? 25 : 20) + "dvh")
       const img = el("img", "pic")
       img.loading = "lazy"
       img.alt = ""
       img.src = abs(it.image)
       img.onerror = () => wrap.remove()
+      const markWide = () => img.naturalWidth > img.naturalHeight * 2.2 && img.classList.add("wide")
+      img.addEventListener("load", markWide)
+      img.decode().then(markWide, () => {})
       // vary the pan direction per card
       img.style.setProperty("--tx", (Math.random() * 6 - 3).toFixed(1) + "%")
       img.style.setProperty("--ty", (Math.random() * 6 - 3).toFixed(1) + "%")
       wrap.append(img)
+      if (it.video) wrap.append(el("span", "vbadge", "▶ YouTube"))
       inner.append(wrap)
     }
     const crumb = el("div", "crumb")
@@ -529,11 +690,11 @@ html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
     held = true
     down = { x: e.clientX, y: e.clientY, t: performance.now() }
   })
-  addEventListener("pointercancel", () => {
+  const onCancel = () => {
     held = false
     down = null
-  })
-  addEventListener("pointerup", (e) => {
+  }
+  const onUp = (e) => {
     held = false
     const d = down
     down = null
@@ -541,7 +702,9 @@ html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
     if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 10 || performance.now() - d.t > 300) return
     if (String(getSelection() || "")) return
     toggle()
-  })
+  }
+  addEventListener("pointercancel", onCancel)
+  addEventListener("pointerup", onUp)
 
   const seen = new IntersectionObserver(
     (es) => {
@@ -583,7 +746,7 @@ html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
   await more()
   io.observe(sentinel)
 
-  document.addEventListener("keydown", (e) => {
+  const onKey = (e) => {
     if (e.key === " ") {
       e.preventDefault()
       toggle()
@@ -593,6 +756,17 @@ html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
     if (!dir) return
     e.preventDefault()
     feed.scrollBy({ top: dir * feed.clientHeight, behavior: "smooth" })
+  }
+  document.addEventListener("keydown", onKey)
+  // Under Quartz's SPA router, leaving this page keeps the document: drop the
+  // global listeners and observers so Space and arrows work on the next page.
+  window.addCleanup?.(() => {
+    setPlaying(false)
+    document.removeEventListener("keydown", onKey)
+    removeEventListener("pointerup", onUp)
+    removeEventListener("pointercancel", onCancel)
+    io.disconnect()
+    seen.disconnect()
   })
 })()
 </script>

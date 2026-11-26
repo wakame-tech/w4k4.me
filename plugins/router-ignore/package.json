@@ -1,0 +1,32 @@
+{
+  "name": "@w4k4/router-ignore",
+  "version": "1.0.0",
+  "description": "Make internal links to standalone pages (e.g. /shorts) skip Quartz's SPA router",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "quartz": {
+    "name": "router-ignore",
+    "displayName": "Router Ignore",
+    "category": "transformer",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 80,
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "slugs": ["shorts"]
+    },
+    "optionSchema": {
+      "slugs": { "type": "array" }
+    }
+  }
+}

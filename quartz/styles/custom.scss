@@ -384,9 +384,13 @@ h2 + .page-listing > p:first-child {
   }
 }
 
-// Search: the theme makes the results panel transparent, so result text sat
-// on top of the (only slightly blurred) page behind it. Give it the page
-// background again.
+// Search: the theme makes the results panel transparent and the overlay only
+// blurs the page 4px, so results and the page behind them mixed. Make the
+// overlay itself nearly opaque and the results panel solid.
+html[saved-theme] body .search > .search-container {
+  background-color: color-mix(in srgb, var(--light) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
 html[saved-theme] body .search > .search-container > .search-space > .search-layout {
   background-color: var(--light);
 }
