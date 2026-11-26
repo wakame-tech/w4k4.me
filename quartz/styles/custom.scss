@@ -74,7 +74,9 @@ html[saved-theme] .note-properties-tags a.internal-link.tag-link {
 // highlight. The theme's tag rule ties on specificity and loads after this
 // file, hence !important.
 $teal-500: #14b8a6;
-html[saved-theme] body a.internal-link.tag-link,
+// `a.tag-link` alone also covers folder/tag page lists, whose tag links lack
+// `internal-link`.
+html[saved-theme] body a.tag-link,
 html[saved-theme] body .backlinks a.internal {
   &,
   &:hover {
@@ -342,4 +344,9 @@ html[saved-theme] body li.section-li {
     margin-top: 0;
     margin-bottom: 0;
   }
+}
+
+// "29 items under this folder." / "6 items with this tag." add nothing.
+.page-listing > p:first-child {
+  display: none;
 }
