@@ -366,3 +366,41 @@ h2 + .page-listing > p:first-child {
   padding: 0.35em 0;
   margin: 0.65em 0;
 }
+
+// Inline math too wide for a phone screen was cut off at the right edge (the
+// page itself never scrolls sideways). On phones only, let such a formula
+// scroll on its own; inline-block shifts the baseline slightly, so desktop
+// keeps KaTeX's default.
+@media all and #{$mobile} {
+  :is(p, li, td) > .katex {
+    display: inline-block;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    // room for glyphs 2-3px outside the box, without taller lines
+    padding: 0.3em 0;
+    margin: -0.15em 0;
+    vertical-align: middle;
+  }
+}
+
+// Search: the theme makes the results panel transparent, so result text sat
+// on top of the (only slightly blurred) page behind it. Give it the page
+// background again.
+html[saved-theme] body .search > .search-container > .search-space > .search-layout {
+  background-color: var(--light);
+}
+
+// Note properties: the ", " separators became flex items with the gap on
+// both sides ("#rust , #ipu"). Drop them; the gap alone separates the tags.
+.note-properties-tags {
+  gap: 0.3rem 0.6rem;
+  & > .note-properties-separator {
+    display: none;
+  }
+}
+
+// The date sat flush against the properties table.
+.note-properties + .content-meta {
+  margin-top: 0.6rem;
+}

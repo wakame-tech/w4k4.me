@@ -115,6 +115,9 @@ plugins:
   - source: github:quartz-community/description
     enabled: true
     order: 70
+  - source: ./plugins/unescape-text
+    enabled: true
+    order: 75
   - source: github:quartz-community/latex
     enabled: true
     options:
