@@ -262,3 +262,38 @@ html[saved-theme] .toc ul.toc-content li {
 .explorer ul.explorer-ul > li > a.nav-file-title {
   padding-left: 25px;
 }
+
+// Links: Quartz paints internal links with a yellow highlight while the theme
+// colours them purple, and external links get neither. Drop the highlight so
+// every link is plain coloured text, underlined on hover.
+html[saved-theme] body a.internal:not(:has(> img)) {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+// Tag lists (folder and tag pages): the theme draws a faint pill on the <li>
+// and Quartz a highlight on the <a>, two mismatched boxes plus list bullets.
+// Show tags as plain "#tag" text, like the note properties do.
+html[saved-theme] body ul.tags {
+  list-style: none;
+  padding-left: 0;
+  & > li {
+    background: none;
+    border: 0;
+    padding: 0;
+    &::before,
+    &::marker {
+      content: none;
+    }
+  }
+  & > li > a.tag-link {
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+}
