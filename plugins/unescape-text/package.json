@@ -1,0 +1,27 @@
+{
+  "name": "@w4k4/unescape-text",
+  "version": "1.0.0",
+  "description": "Undo the description plugin's HTML escaping of the plain page text",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "quartz": {
+    "name": "unescape-text",
+    "displayName": "Unescape Text",
+    "category": "transformer",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 75,
+    "defaultEnabled": true,
+    "defaultOptions": {}
+  }
+}

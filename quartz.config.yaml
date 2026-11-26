@@ -115,6 +115,9 @@ plugins:
   - source: github:quartz-community/description
     enabled: true
     order: 70
+  - source: ./plugins/unescape-text
+    enabled: true
+    order: 75
   - source: github:quartz-community/latex
     enabled: true
     options:
@@ -224,6 +227,8 @@ plugins:
     layout:
       position: beforeBody
       priority: 20
+      # the top page is regenerated, so its date says nothing to readers
+      condition: not-index
   - source: github:quartz-community/tag-list
     enabled: false
     layout:
@@ -268,6 +273,10 @@ plugins:
         - monthly
         - yearly
       limit: 20
+  - source: ./plugins/shorts
+    enabled: true
+    options:
+      slug: shorts
   - source: ./plugins/bluesky-embed
     enabled: true
   - source: ./plugins/post-nav

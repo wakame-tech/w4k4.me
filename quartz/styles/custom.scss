@@ -74,7 +74,9 @@ html[saved-theme] .note-properties-tags a.internal-link.tag-link {
 // highlight. The theme's tag rule ties on specificity and loads after this
 // file, hence !important.
 $teal-500: #14b8a6;
-html[saved-theme] body a.internal-link.tag-link,
+// `a.tag-link` alone also covers folder/tag page lists, whose tag links lack
+// `internal-link`.
+html[saved-theme] body a.tag-link,
 html[saved-theme] body .backlinks a.internal {
   &,
   &:hover {
@@ -255,4 +257,150 @@ html[saved-theme] .toc ul.toc-content li {
     font-size: 0.92em;
     font-weight: 400;
   }
+}
+
+// Explorer: top-level folders start with a chevron, top-level files (e.g.
+// 自己紹介) don't, so files sat 25px left of the folder names. Line them up.
+.explorer ul.explorer-ul > li > a.nav-file-title {
+  padding-left: 25px;
+}
+
+// Links: Quartz paints internal links with a yellow highlight while the theme
+// colours them purple, and external links get neither. Drop the highlight so
+// every link is plain coloured text, underlined on hover.
+html[saved-theme] body a.internal:not(:has(> img)) {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+// Tag lists (folder and tag pages): the theme draws a faint pill on the <li>
+// and Quartz a highlight on the <a>, two mismatched boxes plus list bullets.
+// Show tags as plain "#tag" text, like the note properties do.
+html[saved-theme] body ul.tags {
+  list-style: none;
+  padding-left: 0;
+  & > li {
+    background: none;
+    border: 0;
+    padding: 0;
+    &::before,
+    &::marker {
+      content: none;
+    }
+  }
+  & > li > a.tag-link {
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+}
+
+// Folder/tag page rows: tags stacked down a third column, so a post with
+// four tags made its row ~1.7x taller. Put them on one line under the title
+// instead, fading out what doesn't fit, so rows keep the same height.
+// Popovers keep hiding tags (rule below; ours would otherwise win).
+li.section-li > .section {
+  grid-template-columns: fit-content(8em) minmax(0, 1fr);
+  & > .desc {
+    grid-column: 2;
+  }
+  & > ul.tags {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.7em;
+    margin: 0.15rem 0 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 0.85em;
+    mask-image: linear-gradient(to right, #000 85%, transparent);
+    & > li {
+      margin: 0;
+      flex-shrink: 0;
+    }
+  }
+}
+@media all and (max-width: 600px) {
+  li.section-li > .section > ul.tags {
+    display: flex;
+  }
+}
+.popover li.section-li > .section > ul.tags {
+  display: none;
+}
+// The theme gives the row title 16px margins and the row none, which put the
+// tag line closer to the next row than to its own title.
+html[saved-theme] body li.section-li {
+  margin-bottom: 1.1rem;
+  & > .section > .desc > h3,
+  & > .section > .meta {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+// "29 items under this folder." / "6 items with this tag." add nothing. The
+// tag index (/tags) keeps it: under each tag heading it says "Showing first
+// 10" when the list is cut short.
+.page-listing > p:first-child {
+  display: none;
+}
+h2 + .page-listing > p:first-child {
+  display: block;
+}
+
+// Wide display math ran off the right edge on phones and scrolled the whole
+// page sideways; scroll the formula on its own instead.
+// The padding (taken back from the margin) leaves room for glyphs that poke
+// 2-4px outside the box, which overflow-y: hidden would otherwise clip.
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35em 0;
+  margin: 0.65em 0;
+}
+
+// Inline math too wide for a phone screen was cut off at the right edge (the
+// page itself never scrolls sideways). On phones only, let such a formula
+// scroll on its own; inline-block shifts the baseline slightly, so desktop
+// keeps KaTeX's default.
+@media all and #{$mobile} {
+  :is(p, li, td) > .katex {
+    display: inline-block;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    // room for glyphs 2-3px outside the box, without taller lines
+    padding: 0.3em 0;
+    margin: -0.15em 0;
+    vertical-align: middle;
+  }
+}
+
+// Search: the theme makes the results panel transparent, so result text sat
+// on top of the (only slightly blurred) page behind it. Give it the page
+// background again.
+html[saved-theme] body .search > .search-container > .search-space > .search-layout {
+  background-color: var(--light);
+}
+
+// Note properties: the ", " separators became flex items with the gap on
+// both sides ("#rust , #ipu"). Drop them; the gap alone separates the tags.
+.note-properties-tags {
+  gap: 0.3rem 0.6rem;
+  & > .note-properties-separator {
+    display: none;
+  }
+}
+
+// The date sat flush against the properties table.
+.note-properties + .content-meta {
+  margin-top: 0.6rem;
 }
