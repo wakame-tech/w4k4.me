@@ -118,6 +118,9 @@ plugins:
   - source: ./plugins/unescape-text
     enabled: true
     order: 75
+  - source: ./plugins/router-ignore
+    enabled: true
+    order: 80
   - source: github:quartz-community/latex
     enabled: true
     options:
