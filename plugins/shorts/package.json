@@ -1,0 +1,40 @@
+{
+  "name": "@w4k4/shorts",
+  "version": "0.2.0",
+  "description": "Short-video style feed of random passages (and images) from every page",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "quartz": {
+    "name": "shorts",
+    "displayName": "Shorts",
+    "category": "emitter",
+    "version": "0.2.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "slug": "shorts",
+      "minChars": 100,
+      "maxChars": 280,
+      "dropChars": 30,
+      "shardSize": 150
+    },
+    "optionSchema": {
+      "slug": { "type": "string" },
+      "minChars": { "type": "number" },
+      "maxChars": { "type": "number" },
+      "dropChars": { "type": "number" },
+      "shardSize": { "type": "number" }
+    }
+  }
+}
